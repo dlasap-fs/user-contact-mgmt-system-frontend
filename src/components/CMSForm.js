@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 
 export const CMSForm = () => {
+  const [isVerified, setIsVerified] = useState(false)
   const [formDetails, setFormDetails] = useState({
     first_name: "",
     second_name: "",
@@ -26,6 +27,13 @@ export const CMSForm = () => {
       submit_attempt: true
     }))
 
+    const form_answers = Object.values(formDetails)
+    //checks if all answers are existing
+    const isGood = form_answers.every(Boolean)
+
+
+    //API CALL
+    isGood ? setIsVerified(true) : setIsVerified(false)
   }
 
   const handleReset = (e)=>{
@@ -99,7 +107,7 @@ export const CMSForm = () => {
         Reset Form
        </Button>
 
-       { formDetails.submit_attempt && <Navigate replace to="/submitted"></Navigate> }
+       { (formDetails.submit_attempt && isVerified )&& <Navigate replace to="/submitted"></Navigate> }
     </FormControl>
     </div>
     )
