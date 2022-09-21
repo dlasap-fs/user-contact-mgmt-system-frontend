@@ -6,7 +6,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <div> <h1> Contact Management System - ReactJS </h1></div>
+        <div> <h1> Contact Management System </h1>
+        <p> ReactJS</p></div>
       </header>
       <CMSForm/>
     </div>

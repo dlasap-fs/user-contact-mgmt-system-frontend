@@ -6,7 +6,8 @@ export const CMSForm = () => {
     first_name: "",
     second_name: "",
     physical_address: "",
-    billing_address: ""
+    billing_address: "",
+    submit_attempt: false
   })
 
   const handleOnChange = (e) =>{
@@ -18,6 +19,11 @@ export const CMSForm = () => {
   }
   const handleSubmit = (e)=>{
     e.preventDefault();
+    setFormDetails((prevState)=>
+    ({
+      ...prevState,
+      submit_attempt: true
+    }))
     console.log(
       "form", formDetails
     )
@@ -28,7 +34,8 @@ export const CMSForm = () => {
       first_name: "",
       second_name: "",
       physical_address: "",
-      billing_address: ""
+      billing_address: "",
+      submit_attempt: false
     })
   }
     return (
@@ -42,6 +49,8 @@ export const CMSForm = () => {
       label="First Name"
       onChange={handleOnChange}
       value={formDetails.first_name || ""}
+      error={!formDetails.first_name && formDetails.submit_attempt ? true : false}
+
     />
 
     <TextField
@@ -50,6 +59,7 @@ export const CMSForm = () => {
       label="Second Name"
       onChange={handleOnChange}
       value={formDetails.second_name || ""}
+      error={!formDetails.second_name && formDetails.submit_attempt ? true : false}
     />
     <TextField
       helperText="Please enter your Physical Address"
@@ -57,6 +67,8 @@ export const CMSForm = () => {
       label="Physical Address"
       onChange={handleOnChange}
       value={formDetails.physical_address || ""}
+      error={!formDetails.physical_address && formDetails.submit_attempt ? true : false}
+
     />
     <TextField
       helperText="Please enter your Billing Address"
@@ -64,6 +76,8 @@ export const CMSForm = () => {
       label="Billing Address"
       value={formDetails.billing_address || ""}
       onChange={handleOnChange}
+      error={!formDetails.billing_address && formDetails.submit_attempt ? true : false}
+
     />
           
         <Button
