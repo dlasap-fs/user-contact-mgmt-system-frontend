@@ -1,5 +1,6 @@
 import { FormControl, InputLabel, Input, FormHelperText, Button, TextField} from "@mui/material";
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 
 export const CMSForm = () => {
   const [formDetails, setFormDetails] = useState({
@@ -24,9 +25,7 @@ export const CMSForm = () => {
       ...prevState,
       submit_attempt: true
     }))
-    console.log(
-      "form", formDetails
-    )
+
   }
 
   const handleReset = (e)=>{
@@ -99,6 +98,8 @@ export const CMSForm = () => {
           >
         Reset Form
        </Button>
+
+       { formDetails.submit_attempt && <Navigate replace to="/submitted"></Navigate> }
     </FormControl>
     </div>
     )
