@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import { CMSForm } from './components/CMSForm'
 import './App.css';
 import { PostForm } from './components/PostForm';
@@ -15,8 +14,6 @@ function App() {
         <div> <h1> Contact Management System </h1>
         <p> ReactJS</p></div>
       </header>
-      {/* <CMSForm/>
-      <PostForm/> */}
       <Routes>
         <Route path="/" element={<CMSForm />} /> 
         <Route path="/submitted" element={<PostForm />} /> 

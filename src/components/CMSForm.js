@@ -1,19 +1,21 @@
-import { FormControl, InputLabel, Input, FormHelperText, Button, TextField} from "@mui/material";
+import { FormControl, Button, TextField} from "@mui/material";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { helper } from "../utils/helper"
+
+const { DATABASE_URL = "http://localhost:8080" } = process.env
 
 export const CMSForm = () => {
   const [isVerified, setIsVerified] = useState(false)
   const [formDetails, setFormDetails] = useState({
     first_name: "",
-    second_name: "",
+    last_name: "",
     physical_address: "",
     billing_address: "",
     submit_attempt: false
   })
 
   const handleOnChange = (e) =>{
-    console.log(e.target.value, e.target.id)
     setFormDetails((prevState)=>({
       ...prevState,
       [e.target.id]: e.target.value
@@ -31,15 +33,23 @@ export const CMSForm = () => {
     //checks if all answers are existing
     const isGood = form_answers.every(Boolean)
 
-
     //API CALL
-    isGood ? setIsVerified(true) : setIsVerified(false)
+    isGood && helper.APICALL.POST(`${DATABASE_URL}/record`, {
+      first_name: formDetails.first_name,
+      last_name: formDetails.last_name,
+      delivery_address: {
+        physical_address: formDetails.physical_address,
+        billing_address: formDetails.billing_address
+      }
+    }).then(data => {
+      data.status === 200 && data.data.success ? setIsVerified(true) : setIsVerified(false)
+      console.log("DATA", data)})
   }
 
   const handleReset = (e)=>{
     setFormDetails({
       first_name: "",
-      second_name: "",
+      last_name: "",
       physical_address: "",
       billing_address: "",
       submit_attempt: false
@@ -62,11 +72,11 @@ export const CMSForm = () => {
 
     <TextField
       helperText="Please enter your second name"
-      id="second_name"
+      id="last_name"
       label="Second Name"
       onChange={handleOnChange}
-      value={formDetails.second_name || ""}
-      error={!formDetails.second_name && formDetails.submit_attempt ? true : false}
+      value={formDetails.last_name || ""}
+      error={!formDetails.last_name && formDetails.submit_attempt ? true : false}
     />
     <TextField
       helperText="Please enter your Physical Address"
