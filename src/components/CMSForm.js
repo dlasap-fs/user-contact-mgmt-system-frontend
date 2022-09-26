@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { helper } from "../utils/helper"
 
-const { REACT_APP_DATABASE_URL = "http://localhost", REACT_APP_DATABASE_PORT = "8080" } = process.env
+const { REACT_APP_DATABASE_URL = "http://localhost" } = process.env
 
 export const CMSForm = () => {
   const [isVerified, setIsVerified] = useState(false)
@@ -34,7 +34,7 @@ export const CMSForm = () => {
     const isGood = form_answers.every(Boolean)
 
     //API CALL
-    isGood && helper.APICALL.POST(`${REACT_APP_DATABASE_URL}:${parseInt(REACT_APP_DATABASE_PORT)}/record`, {
+    isGood && helper.APICALL.POST(`${REACT_APP_DATABASE_URL}/record`, {
       first_name: formDetails.first_name,
       last_name: formDetails.last_name,
       delivery_address: {
