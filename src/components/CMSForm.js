@@ -71,12 +71,15 @@ export const CMSForm = () => {
     })
   }
     return (
-    <div style={{padding: '5px'}}>
-     <FormControl sx={{ width: '35ch' }}>
+    <div style={{padding: '5px', margin : "auto", justifyItems: "center", background: "#DDE2EC", width: "500px", height: "500px", borderStyle: "ridge"}}>
+     <FormControl sx={{ width: '35ch', margin: "auto" , padding: "10px"}}>
 
-    <label style={{fontSize: '40px'}}> CMS FORM</label>
+    <label style={{fontSize: '50px', fontFamily: "Roboto", margin: "10px"}}> CMS FORM</label>
     <TextField
-      helperText="Please enter your first name"
+      
+      style={{padding: 5}}
+      required
+      helperText={!formDetails.first_name && formDetails.submit_attempt ? "Please enter your first name" : "" }
       id="first_name"
       label="First Name"
       onChange={handleOnChange}
@@ -86,7 +89,9 @@ export const CMSForm = () => {
     />
 
     <TextField
-      helperText="Please enter your last name"
+      style={{padding: 5 }}
+      helperText={!formDetails.last_name && formDetails.submit_attempt ? "Please enter your last name" : ""}
+      required
       id="last_name"
       label="Last Name"
       onChange={handleOnChange}
@@ -94,7 +99,9 @@ export const CMSForm = () => {
       error={!formDetails.last_name && formDetails.submit_attempt ? true : false}
     />
     <TextField
-      helperText="Please enter your Physical Address"
+      style={{padding: 5 }}
+      helperText={!formDetails.physical_address && formDetails.submit_attempt ? "Please enter your Physical Address" : ""}
+      required
       id="physical_address"
       label="Physical Address"
       onChange={handleOnChange}
@@ -103,7 +110,9 @@ export const CMSForm = () => {
 
     />
     <TextField
-      helperText="Please enter your Billing Address"
+      style={{padding: 5 }}
+      required
+      helperText={ !formDetails.billing_address && formDetails.submit_attempt ? "Please enter your Billing Address" : ""}
       id="billing_address"
       label="Billing Address"
       value={formDetails.billing_address || ""}
@@ -115,6 +124,7 @@ export const CMSForm = () => {
      
 
     <Button
+            style={{margin: 5}}
             type="submit"
             variant="contained"
             color="primary"
@@ -125,9 +135,10 @@ export const CMSForm = () => {
         Submit Form
        </Button>
        <Button
+            style={{margin: 5}}
             type="submit"
             variant="contained"
-            color="secondary"
+            color="error"
             // className={classes.submit}
             onClick={handleReset}
             disabled={openLoader}
@@ -139,22 +150,25 @@ export const CMSForm = () => {
       </Box>
     </div>
 
-    <div style={{padding: 60, position: "relative"}}> 
+    <div> 
        { (formDetails.submit_attempt && isVerified )&& <Navigate replace to="/submitted"></Navigate> }
        <Modal
-       sx={{ padding: 10, width: "50%", margin: "auto", border: "3px"  }}
+       style={{ width: "30%", height: "15%", margin: "auto"}}
         open={openModal}
         // onClose={handleM}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         >
-    <Box sx={{ backgroundColor : "white", padding: "20px", width: "60%", border: "100 px"}}>
+
+    <Box sx={{ backgroundColor : "white", padding: "20px 10px 1px 10px", border: "5x", borderStyle: "groove", margin: "auto"}}>
     <Typography id="modal-modal-title" variant="h6" component="h2">
     Something went wrong...
+    <hr/>
     </Typography>
-    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-         Unable to process your request. Please check your internet connection. </Typography>
-         <Button variant="text" color="primary" onClick={handleModal}> Close </Button>
+    <Typography id="modal-modal-description" sx={{ mt: 2 }} style={{margin:"auto"}}>
+        Unable to process your request. Please check your internet connection.
+    </Typography>
+    <Button style={{margin: "5px", padding: "3px", fontSize: 10, }} variant="contained" size="small" color="error" onClick={handleModal}> Close </Button>
         </Box>
       </Modal>
       </div>
