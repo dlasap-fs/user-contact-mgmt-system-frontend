@@ -1,4 +1,4 @@
-import { FormControl, Button, TextField} from "@mui/material";
+import { FormControl, Button, TextField, Modal, Box, Typography,CircularProgress} from "@mui/material";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { helper } from "../utils/helper"
@@ -7,6 +7,8 @@ const { REACT_APP_DATABASE_URL = "http://localhost" } = process.env
 
 export const CMSForm = () => {
   const [isVerified, setIsVerified] = useState(false)
+  const [openModal, setModal] = useState(false)
+  const [openLoader, setLoader]= useState(false)
   const [formDetails, setFormDetails] = useState({
     first_name: "",
     last_name: "",
@@ -21,7 +23,14 @@ export const CMSForm = () => {
       [e.target.id]: e.target.value
     }))
   }
+  const handleModal = () =>{
+    setModal(!openModal)
+  }
   const handleSubmit = (e)=>{
+    const form_answers = Object.values(formDetails)
+    //checks if all answers are existing
+    const isGood = form_answers.every(Boolean)
+
     e.preventDefault();
     setFormDetails((prevState)=>
     ({
@@ -29,9 +38,7 @@ export const CMSForm = () => {
       submit_attempt: true
     }))
 
-    const form_answers = Object.values(formDetails)
-    //checks if all answers are existing
-    const isGood = form_answers.every(Boolean)
+    isGood && setLoader(true)
 
     //API CALL
     isGood && helper.APICALL.POST(`${REACT_APP_DATABASE_URL}/record`, {
@@ -42,8 +49,16 @@ export const CMSForm = () => {
         billing_address: formDetails.billing_address
       }
     }).then(data => {
-      data.status === 200 && data.data.success ? setIsVerified(true) : setIsVerified(false)
-      console.log("DATA", data)})
+      data.status === 200 && data.data.success ? setIsVerified(true) : (setIsVerified(false))
+      // data.status !== 200 && data.data.success ? setModal(true) : setModal(false)
+      console.log("DATA", data)
+      setLoader(false)
+    })
+      .catch(error =>{
+        setModal(true)
+        setLoader(false)
+        console.log("ERROR :", error)
+      })
   }
 
   const handleReset = (e)=>{
@@ -71,9 +86,9 @@ export const CMSForm = () => {
     />
 
     <TextField
-      helperText="Please enter your second name"
+      helperText="Please enter your last name"
       id="last_name"
-      label="Second Name"
+      label="Last Name"
       onChange={handleOnChange}
       value={formDetails.last_name || ""}
       error={!formDetails.last_name && formDetails.submit_attempt ? true : false}
@@ -96,29 +111,55 @@ export const CMSForm = () => {
       error={!formDetails.billing_address && formDetails.submit_attempt ? true : false}
 
     />
-          
-        <Button
+    <div >
+     
+
+    <Button
             type="submit"
             variant="contained"
             color="primary"
             // className={classes.submit}
             onClick={handleSubmit}
+            disabled={openLoader}
           >
         Submit Form
        </Button>
-
        <Button
             type="submit"
             variant="contained"
             color="secondary"
             // className={classes.submit}
             onClick={handleReset}
-          >
+            disabled={openLoader}
+            >
         Reset Form
        </Button>
+       <Box>
+      {openLoader && <CircularProgress color="warning"/>}  
+      </Box>
+    </div>
 
+    <div style={{padding: 60, position: "relative"}}> 
        { (formDetails.submit_attempt && isVerified )&& <Navigate replace to="/submitted"></Navigate> }
+       <Modal
+       sx={{ padding: 10, width: "50%", margin: "auto", border: "3px"  }}
+        open={openModal}
+        // onClose={handleM}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        >
+    <Box sx={{ backgroundColor : "white", padding: "20px", width: "60%", border: "100 px"}}>
+    <Typography id="modal-modal-title" variant="h6" component="h2">
+    Something went wrong...
+    </Typography>
+    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+         Unable to process your request. Please check your internet connection. </Typography>
+         <Button variant="text" color="primary" onClick={handleModal}> Close </Button>
+        </Box>
+      </Modal>
+      </div>
     </FormControl>
+    
     </div>
     )
 }

@@ -8,11 +8,10 @@ import {
 function App() {
   return (
     <Router>
-
     <div className="App">
       <header className="App-header">
         <div> <h1> Contact Management System </h1>
-        <p> ReactJS</p></div>
+      </div>
       </header>
       <Routes>
         <Route path="/" element={<CMSForm />} /> 
