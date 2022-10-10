@@ -1,5 +1,4 @@
-import { useState } from "react";
-import * as React from 'react';
+import { useState, useEffect } from "react";
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,12 +7,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import Stack from '@mui/material/Stack';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton } from "@mui/material";
+import { IconButton,CircularProgress } from "@mui/material";
+import { helper } from "../utils/helper";
+import { EditModal } from "./EditModal";
+import DeleteDialog from "./DeleteDialog";
 
+const { REACT_APP_DATABASE_URL = "http://localhost" } = process.env
 
 function createData(
     id,
@@ -26,7 +28,7 @@ function createData(
     return { id, first_name, last_name, billing_address, physical_address, created_date };
   }
   
-  const rows = [
+  const data_rows = [
     createData('1','Dominic', 'Lasap', { 
         billing_address : "CEBU",
         physical_address: "PH"
@@ -37,6 +39,26 @@ function createData(
     }, new Date().toLocaleString()),
   ];
 
+
+export const CMSGrid = () =>{
+
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const [rows, setRows] = useState([])
+    const [loaded, setLoaded] = useState(false)
+    const [{showEdit, showDelete, edit_data, delete_data}, setShowModal] = useState({
+        showEdit : false,
+        showDelete: false,
+        edit_data : {},
+        delete_data : {}
+    })
+    const [{confirm_delete, confirm_edit}, setConfirmModify] = useState({
+        confirm_delete: false,
+        confirm_edit: false
+    })
+
+    
   const columns = [
     { id: 'first_name', label: 'First Name', minWidth: 170 },
     { id: 'last_name', label: 'Last Name', minWidth: 100 },
@@ -70,69 +92,130 @@ function createData(
   ];
 
  
-
-export const CMSGrid = () =>{
-
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-    const [rowsData, setRowsData] = useState([""])
-
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
       };
     
-      const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
         setPage(0);
       };
 
-    const handleRows = () =>{
+      const handleEditButton = (data)=>{
+        setShowModal((prev)=> {
+             return {
+            ...prev,
+            showEdit: true,
+            edit_data : data
+        }})
+      }
 
-    }
+      const handleDeleteButton = (data)=>{
+        setShowModal((prev)=> {
+            return {
+           ...prev,
+           showDelete: true,
+           delete_data: data
+       }})
+      }
 
-    const generateActions = (data_id) =>{
+      const handleConfirmDelete = async (id, handleClose, handleLoading) =>{
+        setConfirmModify((prev)=>{
+            return {
+                ...prev,
+                confirm_delete: true
+            }
+        })
+        handleLoading(true)
+        helper.APICALL.DELETE(`${REACT_APP_DATABASE_URL}/record/${id}`).then(
+            ()=>{
+                setConfirmModify((prev)=>{
+                    return {
+                        ...prev,
+                        confirm_delete: false
+                    }
+                })
+                handleLoading(false)
+                handleClose()
+                setRows((prev)=>{
+                    return prev.filter((data)=> data.id !== id)
+                })
+            }
+        ).catch((error)=> {
+            console.log(error)
+            setConfirmModify((prev)=>{
+                return {
+                    ...prev,
+                    confirm_delete: false
+                }
+            })
+            handleLoading(false)
+            handleClose()
+        })
+      }
+      
+    const generateActions = (row) =>{
         return (
             <div>
-            <IconButton color="primary" onClick={()=>handleEditButton(data_id, "hello")}>
+            <IconButton color="primary" onClick={()=>handleEditButton(row)}>
                 <EditIcon/>
             </IconButton>
-            <IconButton color="error">
+            <IconButton color="error" onClick={()=>handleDeleteButton(row)}>
                 <DeleteIcon/>
             </IconButton>
             </div>
         )
       }
 
-      const handleEditButton = (id, data)=>{
-        alert(`HI ${id} ${data}`)
-      }
+      useEffect(()=>{
+        helper.APICALL.GET(`${REACT_APP_DATABASE_URL}/records`).then(({data})=>{
+            const new_format_data = data.map(({_id,first_name, last_name, delivery_address, created_date})=> {
+                return {
+                    id:_id,
+                    first_name,
+                    last_name,
+                    created_date,
+                    billing_address: delivery_address.billing_address,
+                    physical_address: delivery_address.physical_address
+                }
+            })
+            setLoaded(true)
+            setRows(new_format_data)
+        }).catch((error)=> {
+            console.log(error)
+            setLoaded(true)
+        })
+      }, [])
 
     return (
-        <Paper sx={{ width: '100%' }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
+        <Paper sx={{ width: '70%', margin: "auto" }}>
+        <TableContainer sx={{ maxHeight: 700 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="center" colSpan={2}>
+                <TableCell align="center" colSpan={1}>
                   Name
                 </TableCell>
-                <TableCell align="center" colSpan={3}>
+                <TableCell align="center" colSpan={4}>
                   Delivery Address
                 </TableCell>
+                <TableCell align="center" colSpan={1}/>
               </TableRow>
               <TableRow>
                 {columns.map((column) => (
-                  <TableCell
+                    <TableCell
                     key={column.id}
                     align={column.align}
                     style={{ top: 57, minWidth: column.minWidth }}
-                  >
+                    >
                     {column.label}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
+
+            { !loaded && <CircularProgress style={{top: "33%", left:"50%", position: "absolute", }}/>
+            }
             <TableBody>
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -142,10 +225,10 @@ export const CMSGrid = () =>{
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (
-                          <TableCell key={column.id} align={column.align}>
-                            {column.id === "actions" ? 
-                                generateActions(row.id)
-                             :value }
+                          <TableCell id={rows.id} key={column.id} align={column.align}>
+                            {column.id === "actions" && rows.length ? 
+                                generateActions(row)
+                             : column.id === "created_date" ? new Date(value).toLocaleString() : value }
 
                           </TableCell>
                         );
@@ -165,6 +248,24 @@ export const CMSGrid = () =>{
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+
+        {showEdit && <EditModal {...{
+            title : "Edit Record",
+            toggle: showEdit,
+            setShowModal,
+            setConfirmModify,
+            data: edit_data
+        }}/>}
+        {showDelete && <DeleteDialog {...{
+            toggle: showDelete,
+            title: "Delete Record",
+            message: `Are you sure you want to delete`,
+            data: delete_data,
+            setShowModal,
+            handleConfirmDelete,
+        }}>
+            {confirm_delete && <CircularProgress size={20} style={{margin: "auto"}}/>}
+            </DeleteDialog>}
       </Paper>
    
     )
