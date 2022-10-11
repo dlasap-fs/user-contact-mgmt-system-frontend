@@ -51,7 +51,6 @@ export const CMSForm = () => {
     }).then(data => {
       data.status === 200 && data.data.success ? setIsVerified(true) : (setIsVerified(false))
       // data.status !== 200 && data.data.success ? setModal(true) : setModal(false)
-      console.log("DATA", data)
       setLoader(false)
     })
       .catch(error =>{

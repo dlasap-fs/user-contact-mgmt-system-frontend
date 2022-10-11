@@ -169,11 +169,12 @@ export const CMSGrid = () =>{
                 })
                 setRows((prev)=>{
                   return prev.map((data)=>{
-                console.log(data)
                     if(data.id=== id){
                       return {
                         ...data,
                         id,
+                        first_name,
+                        last_name,
                         billing_address: new_data_params.delivery_address.billing_address,
                         physical_address: new_data_params.delivery_address.physical_address
                       }
@@ -257,7 +258,7 @@ export const CMSGrid = () =>{
               </TableRow>
             </TableHead>
 
-            { !loaded && <CircularProgress style={{top: "33%", left:"50%", position: "absolute", }}/>
+            { !loaded && <CircularProgress style={{top: "29%", left:"50%", position: "absolute", }}/>
             }
             <TableBody>
               {rows
