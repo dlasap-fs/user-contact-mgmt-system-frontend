@@ -48,11 +48,11 @@ export default function DeleteDialog(props) {
         PaperComponent={PaperComponent}
         aria-labelledby="draggable-dialog-title"
       >
-        <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title">
+        <DialogTitle style={{ cursor: 'move' ,  fontWeight:"bold"}} id="draggable-dialog-title">
           {title}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText  >
            {message}
           </DialogContentText>
           <DialogContentText style={{fontSize: "40px"}} color="green">
@@ -64,7 +64,7 @@ export default function DeleteDialog(props) {
           <Button autoFocus disabled={loading} onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="contained" disabled={loading} color="error" onClick={(data)=> {
+          <Button variant="contained" disabled={loading} color="error" onClick={()=> {
             handleConfirmDelete(id, handleClose, setLoading)
             }}> DELETE </Button>
         </DialogActions>

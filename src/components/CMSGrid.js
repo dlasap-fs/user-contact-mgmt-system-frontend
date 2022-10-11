@@ -28,17 +28,6 @@ function createData(
     return { id, first_name, last_name, billing_address, physical_address, created_date };
   }
   
-  const data_rows = [
-    createData('1','Dominic', 'Lasap', { 
-        billing_address : "CEBU",
-        physical_address: "PH"
-    }, new Date().toLocaleString(), 3287263),
-    createData('2','123', 'test', { 
-        billing_address : "CEBU",
-        physical_address: "PH"
-    }, new Date().toLocaleString()),
-  ];
-
 
 export const CMSGrid = () =>{
 
@@ -60,34 +49,35 @@ export const CMSGrid = () =>{
 
     
   const columns = [
-    { id: 'first_name', label: 'First Name', minWidth: 170 },
-    { id: 'last_name', label: 'Last Name', minWidth: 100 },
+    { id: 'first_name', label: 'First Name', minWidth: 100, align: 'center', fontSize: "20px" },
+    { id: 'last_name', label: 'Last Name', minWidth: 100 , align: 'center',fontSize: "20px" },
     {
       id: 'billing_address',
       label: 'Billing Address',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => value.toLocaleString('en-US'),
+      minWidth: 130,
+      align: 'center',
+      fontSize: "20px" 
     },
     {
       id: 'physical_address',
       label: 'Physical Address',
       minWidth: 170,
-      align: 'right',
-      format: (value) => value.toLocaleString('en-US'),
+      align: 'center',
+      fontSize: "20px" 
     },
     {
       id: 'created_date',
       label: 'Created Date',
-      minWidth: 170,
-      align: 'right',
-      format: (value) => value.toFixed(2),
+      minWidth: 130,
+      align: 'center',
+      fontSize: "20px" 
     },
     {
         id: 'actions',
         label: 'Actions',
-        minWidth: 170,
-        align: 'right',
+        minWidth: 70,
+        align: 'center',
+        fontSize: "20px" 
       },
   ];
 
@@ -119,7 +109,7 @@ export const CMSGrid = () =>{
        }})
       }
 
-      const handleConfirmDelete = async (id, handleClose, handleLoading) =>{
+      const handleConfirmDelete =  (id, handleClose, handleLoading) =>{
         setConfirmModify((prev)=>{
             return {
                 ...prev,
@@ -153,7 +143,60 @@ export const CMSGrid = () =>{
             handleClose()
         })
       }
-      
+      const handleConfirmEdit =  (data, handleClose, handleLoading) =>{
+        setConfirmModify((prev)=>{
+            return {
+                ...prev,
+                confirm_edit: true
+            }
+        })
+        handleLoading(true)
+        const { id, first_name, last_name, ...params } = data
+        const new_data_params = {
+          first_name, last_name,
+          delivery_address : {
+            physical_address: params.physical_address,
+            billing_address: params.billing_address
+          }
+        }
+        helper.APICALL.PUT(`${REACT_APP_DATABASE_URL}/record/${id}`,new_data_params ).then(
+            ()=>{
+                setConfirmModify((prev)=>{
+                    return {
+                        ...prev,
+                        confirm_edit: false
+                    }
+                })
+                setRows((prev)=>{
+                  return prev.map((data)=>{
+                console.log(data)
+                    if(data.id=== id){
+                      return {
+                        ...data,
+                        id,
+                        billing_address: new_data_params.delivery_address.billing_address,
+                        physical_address: new_data_params.delivery_address.physical_address
+                      }
+                    }
+                    else return data
+                  })
+                })
+                handleLoading(false)
+                handleClose()
+            }
+        ).catch((error)=> {
+            console.log(error)
+            setConfirmModify((prev)=>{
+                return {
+                    ...prev,
+                    confirm_edit: false
+                }
+            })
+            handleLoading(false)
+            handleClose()
+        })
+      }
+
     const generateActions = (row) =>{
         return (
             <div>
@@ -193,20 +236,20 @@ export const CMSGrid = () =>{
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell align="center" colSpan={1}>
-                  Name
+                <TableCell style={{fontSize: "30px", fontFamily : "sans-serif",fontWeight: "bolder"}} align="center" colSpan={2}>
+                  NAME
                 </TableCell>
-                <TableCell align="center" colSpan={4}>
-                  Delivery Address
+                <TableCell style={{fontSize: "30px", fontWeight: "bolder"}} align="center" colSpan={2.5}>
+                  DELIVERY ADDRESS
                 </TableCell>
-                <TableCell align="center" colSpan={1}/>
+                <TableCell align="center" colSpan={2}/>
               </TableRow>
               <TableRow>
                 {columns.map((column) => (
                     <TableCell
                     key={column.id}
                     align={column.align}
-                    style={{ top: 57, minWidth: column.minWidth }}
+                    style={{ top: 57, minWidth: column.minWidth, fontSize: column.fontSize }}
                     >
                     {column.label}
                   </TableCell>
@@ -225,10 +268,10 @@ export const CMSGrid = () =>{
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (
-                          <TableCell id={rows.id} key={column.id} align={column.align}>
+                          <TableCell id={rows.id} key={column.id} align={column.align} style={{fontSize: column.font_size}}>
                             {column.id === "actions" && rows.length ? 
                                 generateActions(row)
-                             : column.id === "created_date" ? new Date(value).toLocaleString() : value }
+                             : column.id === "created_date" ? new Date(value).toDateString() : value }
 
                           </TableCell>
                         );
@@ -250,15 +293,18 @@ export const CMSGrid = () =>{
         />
 
         {showEdit && <EditModal {...{
-            title : "Edit Record",
+            title : "EDIT RECORD",
             toggle: showEdit,
             setShowModal,
-            setConfirmModify,
-            data: edit_data
-        }}/>}
+            data: edit_data,
+            handleConfirmEdit
+        }}>
+          {confirm_edit && <CircularProgress size={20} style={{margin: "auto", top : "75%", left:"47%", position: "absolute"}}>
+            </CircularProgress>}
+          </EditModal>}
         {showDelete && <DeleteDialog {...{
             toggle: showDelete,
-            title: "Delete Record",
+            title: "DELETE RECORD",
             message: `Are you sure you want to delete`,
             data: delete_data,
             setShowModal,

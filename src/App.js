@@ -12,7 +12,8 @@ function App() {
     <Router>
     <div className="App">
       <header className="App-header">
-        <div> <h1> Contact Management System </h1>
+        <div style={{position: "relative", margin: "auto"}}> 
+      <h1> Contact Management System </h1>
         <Link to="/" style={{ padding: 5, color: "white" }}>
               Home
         </Link>
