@@ -14,6 +14,7 @@ import { IconButton,CircularProgress } from "@mui/material";
 import { helper } from "../utils/helper";
 import { EditModal } from "./EditModal";
 import DeleteDialog from "./DeleteDialog";
+import { SearchBar } from "./SearchBar";
 
 const { REACT_APP_DATABASE_URL = "http://localhost" } = process.env
 
@@ -35,6 +36,8 @@ export const CMSGrid = () =>{
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [rows, setRows] = useState([])
+    const [filterData, setFilterData] = useState([])
+
     const [loaded, setLoaded] = useState(false)
     const [{showEdit, showDelete, edit_data, delete_data}, setShowModal] = useState({
         showEdit : false,
@@ -109,6 +112,33 @@ export const CMSGrid = () =>{
        }})
       }
 
+      const handleSearch = (e)=>{
+        const { value } = e.target
+        
+        const compare_data = rows.map(({
+          id,first_name, last_name, billing_address, physical_address,
+          created_date
+        })=>{
+          const stringified_data = JSON.stringify(
+            {
+              first_name,
+              last_name,
+              physical_address,
+              billing_address,
+              created_date: new Date(created_date).toDateString()
+            }
+          ).toLowerCase()
+          return {
+            id,
+            stringified_data
+          }
+          
+        })
+        const matched_data_ids = compare_data.filter((data)=>data.stringified_data.includes(value.toLowerCase())).map(({id})=> id)
+        const filtered_data = rows.filter((row)=> matched_data_ids.includes(row.id))
+        setFilterData(filtered_data)
+      }
+
       const handleConfirmDelete =  (id, handleClose, handleLoading) =>{
         setConfirmModify((prev)=>{
             return {
@@ -127,7 +157,7 @@ export const CMSGrid = () =>{
                 })
                 handleLoading(false)
                 handleClose()
-                setRows((prev)=>{
+                setFilterData((prev)=>{
                     return prev.filter((data)=> data.id !== id)
                 })
             }
@@ -168,6 +198,21 @@ export const CMSGrid = () =>{
                     }
                 })
                 setRows((prev)=>{
+                  return prev.map((data)=>{
+                    if(data.id=== id){
+                      return {
+                        ...data,
+                        id,
+                        first_name,
+                        last_name,
+                        billing_address: new_data_params.delivery_address.billing_address,
+                        physical_address: new_data_params.delivery_address.physical_address
+                      }
+                    }
+                    else return data
+                  })
+                })
+                setFilterData((prev)=>{
                   return prev.map((data)=>{
                     if(data.id=== id){
                       return {
@@ -225,25 +270,31 @@ export const CMSGrid = () =>{
             })
             setLoaded(true)
             setRows(new_format_data)
+            // setFilterData(new_format_data)
         }).catch((error)=> {
             console.log(error)
             setLoaded(true)
         })
       }, [])
-
+    
+      useEffect(()=>{
+        setFilterData(rows)
+      }, [rows.length])
     return (
-        <Paper sx={{ width: '70%', margin: "auto" }}>
-        <TableContainer sx={{ maxHeight: 700 }}>
+        <Paper sx={{ width: '60%', margin: "auto" }}>
+        <TableContainer sx={{ maxHeight: 600 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell style={{fontSize: "30px", fontFamily : "sans-serif",fontWeight: "bolder"}} align="center" colSpan={2}>
+                <TableCell style={{fontSize: "25px", fontFamily : "sans-serif",fontWeight: "bolder"}} align="center" colSpan={2}>
                   NAME
                 </TableCell>
-                <TableCell style={{fontSize: "30px", fontWeight: "bolder"}} align="center" colSpan={2.5}>
+                <TableCell style={{fontSize: "25px",  fontFamily : "sans-serif", fontWeight: "bolder"}} align="center" colSpan={2.5}>
                   DELIVERY ADDRESS
                 </TableCell>
-                <TableCell align="center" colSpan={2}/>
+                <TableCell align="center" colSpan={2}>
+          {(rows.length && loaded)? <SearchBar {...{handleSearch}}/> : <CircularProgress />}
+                  </TableCell>
               </TableRow>
               <TableRow>
                 {columns.map((column) => (
@@ -261,16 +312,15 @@ export const CMSGrid = () =>{
             { !loaded && <CircularProgress style={{top: "29%", left:"50%", position: "absolute", }}/>
             }
             <TableBody>
-              {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              {filterData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
                     <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (
-                          <TableCell id={rows.id} key={column.id} align={column.align} style={{fontSize: column.font_size}}>
-                            {column.id === "actions" && rows.length ? 
+                          <TableCell id={filterData.id} key={column.id} align={column.align} style={{fontSize: column.font_size}}>
+                            {column.id === "actions" && filterData.length ? 
                                 generateActions(row)
                              : column.id === "created_date" ? new Date(value).toDateString() : value }
 
@@ -286,7 +336,7 @@ export const CMSGrid = () =>{
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={rows.length}
+          count={filterData.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

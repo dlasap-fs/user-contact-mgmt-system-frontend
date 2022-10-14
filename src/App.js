@@ -2,6 +2,7 @@ import './App.css';
 import { CMSForm } from './components/CMSForm'
 import { PostForm } from './components/PostForm';
 import { CMSGrid } from './components/CMSGrid';
+import CMSAppBar from './components/CMSAppBar';
 
 import {
   Routes, Route, Link, BrowserRouter as Router
@@ -10,7 +11,9 @@ import {
 function App() {
   return (
     <Router>
+
     <div className="App">
+
       <header className="App-header">
         <div style={{position: "relative", margin: "auto"}}> 
       <h1> Contact Management System </h1>
@@ -20,6 +23,7 @@ function App() {
         <Link to="/records" style={{ padding: 5,  color: "white" }}>
               Records
         </Link>
+    {/* <CMSAppBar/> */}
        
       </div>
       </header>

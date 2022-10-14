@@ -27,11 +27,11 @@ export const CMSForm = () => {
     setModal(!openModal)
   }
   const handleSubmit = (e)=>{
+    e.preventDefault();
     const form_answers = Object.values(formDetails)
     //checks if all answers are existing
     const isGood = form_answers.every(Boolean)
 
-    e.preventDefault();
     setFormDetails((prevState)=>
     ({
       ...prevState,
@@ -124,7 +124,7 @@ export const CMSForm = () => {
 
     <Button
             style={{margin: 5}}
-            type="submit"
+            type="click"
             variant="contained"
             color="primary"
             // className={classes.submit}
