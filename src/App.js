@@ -13,23 +13,24 @@ function App() {
     <Router>
 
     <div className="App">
-
       <header className="App-header">
-        <div style={{position: "relative", margin: "auto"}}> 
       <h1> Contact Management System </h1>
-        <Link to="/" style={{ padding: 5, color: "white" }}>
-              Home
+      <div>
+        <Link to="/" className='App-Bar'>
+              Form
         </Link>
-        <Link to="/records" style={{ padding: 5,  color: "white" }}>
+        <Link to="/records" className='App-Bar'>
               Records
         </Link>
-    {/* <CMSAppBar/> */}
-       
       </div>
+    {/* <CMSAppBar/> */}
       </header>
+
       <Routes>
-    
-        <Route path="/" element={<CMSForm />} /> 
+        <Route path="/" element={
+        <div  className='CMS-Form'>
+          <CMSForm />   
+        </div>} /> 
         <Route path="/submitted" element={<PostForm />} /> 
         <Route path="/records" element={<CMSGrid />} />
 

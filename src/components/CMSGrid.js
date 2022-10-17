@@ -39,6 +39,8 @@ export const CMSGrid = () =>{
     const [filterData, setFilterData] = useState([])
 
     const [loaded, setLoaded] = useState(false)
+    const [searchValue, setSearchValue] = useState("")
+
     const [{showEdit, showDelete, edit_data, delete_data}, setShowModal] = useState({
         showEdit : false,
         showDelete: false,
@@ -114,7 +116,7 @@ export const CMSGrid = () =>{
 
       const handleSearch = (e)=>{
         const { value } = e.target
-        
+        setSearchValue(value)
         const compare_data = rows.map(({
           id,first_name, last_name, billing_address, physical_address,
           created_date
@@ -137,6 +139,7 @@ export const CMSGrid = () =>{
         const matched_data_ids = compare_data.filter((data)=>data.stringified_data.includes(value.toLowerCase())).map(({id})=> id)
         const filtered_data = rows.filter((row)=> matched_data_ids.includes(row.id))
         setFilterData(filtered_data)
+        setPage(0)
       }
 
       const handleConfirmDelete =  (id, handleClose, handleLoading) =>{
@@ -160,6 +163,11 @@ export const CMSGrid = () =>{
                 setFilterData((prev)=>{
                     return prev.filter((data)=> data.id !== id)
                 })
+                setRows((prev)=>{
+                  return prev.filter((data)=> data.id !== id)
+              })
+              const rows_test = ((filterData.length - 1) % rowsPerPage) === 0
+              rows_test && setPage(page - 1)
             }
         ).catch((error)=> {
             console.log(error)
@@ -278,11 +286,11 @@ export const CMSGrid = () =>{
       }, [])
     
       useEffect(()=>{
-        setFilterData(rows)
+        (!filterData.length && !searchValue)&& setFilterData(rows)
       }, [rows.length])
     return (
         <Paper sx={{ width: '60%', margin: "auto" }}>
-        <TableContainer sx={{ maxHeight: 600 }}>
+        <TableContainer sx={{ maxHeight: 700 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -311,26 +319,30 @@ export const CMSGrid = () =>{
 
             { !loaded && <CircularProgress style={{top: "29%", left:"50%", position: "absolute", }}/>
             }
-            <TableBody>
-              {filterData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <TableCell id={filterData.id} key={column.id} align={column.align} style={{fontSize: column.font_size}}>
-                            {column.id === "actions" && filterData.length ? 
-                                generateActions(row)
-                             : column.id === "created_date" ? new Date(value).toDateString() : value }
+            {filterData.length ? 
+             <TableBody>
+             {filterData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+               .map((row) => {
+                 return (
+                   <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                     {columns.map((column) => {
+                       const value = row[column.id];
+                       return (
+                         <TableCell id={filterData.id} key={column.id} align={column.align} style={{fontSize: column.font_size}}>
+                           {column.id === "actions" && filterData.length ? 
+                               generateActions(row)
+                            : column.id === "created_date" ? new Date(value).toDateString() : value }
 
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
+                         </TableCell>
+                       );
+                     })}
+                   </TableRow>
+                 );
+               }) }
+           </TableBody>
+            : <div style={{position: "relative", margin: "auto", left: "300%"}}> {loaded && "No Records Found."} </div>  
+          }
+           
           </Table>
         </TableContainer>
         <TablePagination

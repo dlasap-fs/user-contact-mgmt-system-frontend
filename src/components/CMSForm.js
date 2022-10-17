@@ -70,13 +70,13 @@ export const CMSForm = () => {
     })
   }
     return (
-    <div style={{padding: '5px', margin : "auto", justifyItems: "center", background: "#DDE2EC", width: "500px", height: "500px", borderStyle: "ridge"}}>
-     <FormControl sx={{ width: '35ch', margin: "auto" , padding: "10px"}}>
+    <div >
+     <FormControl sx={{ width: '40ch', margin: "auto" , padding: "10px", display: "flex", justifyContent: "center", alignItems: "center"}}>
+    <label style={{fontSize: '40px', fontFamily: "Roboto"}}> CMS FORM</label>
 
-    <label style={{fontSize: '50px', fontFamily: "Roboto", margin: "10px"}}> CMS FORM</label>
+    <div style={{margin : 10, display:"flex", justifyContent:"center", alignItems:"center", flexDirection: "column"}}>
     <TextField
-      
-      style={{padding: 5}}
+    style={{marginTop: "10px"}}
       required
       helperText={!formDetails.first_name && formDetails.submit_attempt ? "Please enter your first name" : "" }
       id="first_name"
@@ -84,11 +84,10 @@ export const CMSForm = () => {
       onChange={handleOnChange}
       value={formDetails.first_name || ""}
       error={!formDetails.first_name && formDetails.submit_attempt ? true : false}
-
     />
 
     <TextField
-      style={{padding: 5 }}
+    style={{marginTop: "10px"}}
       helperText={!formDetails.last_name && formDetails.submit_attempt ? "Please enter your last name" : ""}
       required
       id="last_name"
@@ -98,7 +97,7 @@ export const CMSForm = () => {
       error={!formDetails.last_name && formDetails.submit_attempt ? true : false}
     />
     <TextField
-      style={{padding: 5 }}
+    style={{marginTop: "10px"}}
       helperText={!formDetails.physical_address && formDetails.submit_attempt ? "Please enter your Physical Address" : ""}
       required
       id="physical_address"
@@ -106,10 +105,9 @@ export const CMSForm = () => {
       onChange={handleOnChange}
       value={formDetails.physical_address || ""}
       error={!formDetails.physical_address && formDetails.submit_attempt ? true : false}
-
     />
     <TextField
-      style={{padding: 5 }}
+    style={{marginTop: "10px"}}
       required
       helperText={ !formDetails.billing_address && formDetails.submit_attempt ? "Please enter your Billing Address" : ""}
       id="billing_address"
@@ -119,8 +117,8 @@ export const CMSForm = () => {
       error={!formDetails.billing_address && formDetails.submit_attempt ? true : false}
 
     />
-    <div >
      
+    </div>
 
     <Button
             style={{margin: 5}}
@@ -147,7 +145,6 @@ export const CMSForm = () => {
        <Box>
       {openLoader && <CircularProgress color="warning"/>}  
       </Box>
-    </div>
 
     <div> 
        { (formDetails.submit_attempt && isVerified )&& <Navigate replace to="/submitted"></Navigate> }
