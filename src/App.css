@@ -11,14 +11,14 @@
 
 .App-header{
   background-color: #282c34;
-  min-height: 10vh;
-  padding: 10px 0;
+  min-height: 1vh;
+  padding: 5px 0;
   border-radius: 30px;
   margin: 5px;
   width: 100%;
-  max-height: 200px;
+  max-height: 100px;
   color: white;
-  font-size: calc(8px + 1vmin);
+  font-size: calc(6px + 1vmin);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,7 +32,7 @@
  justify-content: center;   
  align-items: center;
  margin: auto;
- max-width: 400px;
+ max-width: 300px;
  border: 3px;
  border-style: groove;
  border-radius: 40px;
