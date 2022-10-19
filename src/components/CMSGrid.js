@@ -290,7 +290,7 @@ export const CMSGrid = () =>{
       }, [rows.length])
     return (
         <Paper sx={{ minWidth: '70%', maxWidth: '90%', margin: "auto" }}>
-        <TableContainer sx={{ maxHeight: 700 }}>
+        <TableContainer sx={{ minHeight: "50%" , maxHeight: "45rem"}}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
@@ -317,7 +317,7 @@ export const CMSGrid = () =>{
               </TableRow>
             </TableHead>
 
-            { !loaded && <CircularProgress style={{top: "29%", left:"50%", position: "absolute", }}/>
+            { !loaded && <CircularProgress style={{top: "28%", left:"50%", position: "absolute", }}/>
             }
             {filterData.length ? 
              <TableBody>

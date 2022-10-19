@@ -13,6 +13,8 @@ function App() {
     <Router>
 
     <div className="App">
+      <div className='Background'>
+
       <header className="App-header">
       <h1> Contact Management System </h1>
       <div>
@@ -44,6 +46,7 @@ function App() {
             </p>
           </h1>} />
       </Routes>
+      </div>
     </div>
     </Router>
   );
